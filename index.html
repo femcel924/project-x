@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Два циферблата</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+            gap: 50px;
+        }
+        canvas {
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clocks-container">
+        <div class="clock-wrapper">
+            <div class="clock-label styled-text">Текущее время(лето)</div>
+            <canvas id="clock1" width="200" height="200"></canvas>
+        </div>
+        <div class="clock-wrapper">
+            <div class="clock-label styled-text">Разница +1 час(зима)</div>
+            <canvas id="clock2" width="200" height="200"></canvas>
+        </div>
+    </div>
+    
+    <style>
+        .clocks-container {
+            display: flex;
+            gap: 80px; /* Расстояние между часами */
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+    
+        .clock-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .clock-label {
+            margin-bottom: 10px; /* Отступ перед canvas */
+        }
+    
+        /* Дополнительные стили для кастомизации текста */
+        .styled-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333; /* Цвет текста */
+            font-family: Arial, sans-serif; /* Шрифт */
+            text-transform: uppercase; /* Делаем текст заглавными буквами */
+            letter-spacing: 1px; /* Расстояние между буквами */
+        }
+
+        .clock-label {
+    margin-bottom: 50px; /* Увеличиваем отступ перед canvas */
+        }
+    </style>
+
+    <script>
+        function drawClock(ctx, offsetHours) {
+            const now = new Date();
+            now.setHours(now.getHours() + offsetHours); // Смещение времени
+
+            const sec = now.getSeconds();
+            const min = now.getMinutes();
+            const hour = now.getHours() % 12;
+
+            ctx.clearRect(0, 0, 200, 200);
+            
+            ctx.save(); // Сохраняем состояние перед трансформациями
+            ctx.translate(100, 100); // Перемещаем центр в середину canvas
+
+            // Рисуем круг циферблата
+            ctx.beginPath();
+            ctx.arc(0, 0, 90, 0, 2 * Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Рисуем отметки часов
+            for (let i = 0; i < 12; i++) {
+                ctx.save();
+                ctx.rotate((i * Math.PI) / 6);
+                ctx.beginPath();
+                ctx.moveTo(75, 0);
+                ctx.lineTo(85, 0);
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Функция для рисования стрелок
+            function drawHand(length, width, angle, color) {
+                ctx.save();
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(-10, 0); // Небольшой хвостик стрелки
+                ctx.lineTo(length, 0);
+                ctx.lineWidth = width;
+                ctx.strokeStyle = color;
+                ctx.lineCap = "round";
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Рисуем часовую, минутную и секундную стрелки
+            drawHand(50, 6, (hour + min / 60) * (Math.PI / 6), "black"); // Часовая стрелка
+            drawHand(70, 4, (min + sec / 60) * (Math.PI / 30), "black"); // Минутная стрелка
+            drawHand(80, 2, sec * (Math.PI / 30), "red"); // Секундная стрелка
+
+            ctx.restore(); // Восстанавливаем состояние
+        }
+
+        function updateClocks() {
+            const ctx1 = document.getElementById("clock1").getContext("2d");
+            const ctx2 = document.getElementById("clock2").getContext("2d");
+
+            drawClock(ctx1, 0);  // Первый циферблат - текущее время
+            drawClock(ctx2, 1);  // Второй - разница в 1 час
+        }
+
+        setInterval(updateClocks, 1000);
+        updateClocks();
+    </script>
+</body>
+</html>
