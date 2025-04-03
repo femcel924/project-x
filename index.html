@@ -106,7 +106,7 @@
             // Функция для рисования стрелок
             function drawHand(length, width, angle, color) {
                 ctx.save();
-                ctx.rotate(angle);
+                ctx.rotate(angle - Math.PI / 2);
                 ctx.beginPath();
                 ctx.moveTo(-10, 0); // Небольшой хвостик стрелки
                 ctx.lineTo(length, 0);
